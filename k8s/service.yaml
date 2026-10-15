@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tc-oficina-execution-service
+spec:
+  type: ClusterIP
+  selector:
+    app: tc-oficina-execution-service
+  ports:
+    - port: 80
+      target: 8083
