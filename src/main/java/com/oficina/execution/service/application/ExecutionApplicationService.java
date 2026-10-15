@@ -9,5 +9,5 @@ public interface ExecutionApplicationService {
     ExecucaoOS registrarPecaSubstituida(Long id, String pecas);
     ExecucaoOS finalizarExecucao(Long id);
     ExecucaoOS consultarPorId(Long id);
-    java.util.List<ExecucaoOS> listarPorStatus(String statusExecucao);
+    List<ExecucaoOS> listarPorStatus(String statusExecucao);
 }
