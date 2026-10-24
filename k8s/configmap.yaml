@@ -1,7 +1,11 @@
 apiVersion: v1
 kind: ConfigMap
-metadata name: execution-service-config
+metadata:
+  name: execution-service-config
+  namespace: oficina-execution
 data:
-  SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/oficina_execution
-  SPRING_KAFKA_BOOTSTRAP-SERVERS: kafka:9092
-  SPRING_APPLICATION_NAME: tc-oficina-execution-service
+  SPRING_PROFILES_ACTIVE: "k8s"
+  SERVER_PORT: "8083"
+  KAFKA_BOOTSTRAP_SERVERS: "kafka.oficina-infra.svc.cluster.local:9092"
+  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,metrics,prometheus"
+  MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: "always"

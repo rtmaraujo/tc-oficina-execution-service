@@ -2,10 +2,15 @@ apiVersion: v1
 kind: Service
 metadata:
   name: tc-oficina-execution-service
+  namespace: oficina-execution
+  labels:
+    app: tc-oficina-execution-service
 spec:
   type: ClusterIP
+  ports:
+    - name: http
+      port: 8083
+      targetPort: 8083
+      protocol: TCP
   selector:
     app: tc-oficina-execution-service
-  ports:
-    - port: 80
-      target: 8083
