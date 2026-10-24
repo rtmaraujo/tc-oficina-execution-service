@@ -48,7 +48,7 @@ public class ExecutionApplicationServiceImpl implements ExecutionApplicationServ
         if (optional.isPresent()) {
             ExecucaoOS execucao = optional.get();
             execucao.setStatusExecucao(statusExecucao);
-            if (statusExecucao.equals(StatusExecucao.CONCLUIDA)) {
+            if (StatusExecucao.CONCLUIDA.toString().equals(statusExecucao)) {
                 execucao.setDataConclusao(java.time.LocalDateTime.now().toString());
                 // Publicar evento de finalização
                 kafkaTemplate.send("order-finalized", execucao.getId().toString(),

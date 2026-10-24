@@ -1,0 +1,26 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: execution-service-ingressroute
+  namespace: oficina-execution
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`35.84.122.229`) && PathPrefix(`/execution`)
+      kind: Rule
+      services:
+        - name: tc-oficina-execution-service
+          port: 8083
+      middlewares:
+        - name: strip-execution-prefix
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-execution-prefix
+  namespace: oficina-execution
+spec:
+  stripPrefix:
+    prefixes:
+      - /execution
