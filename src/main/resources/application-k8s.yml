@@ -26,3 +26,11 @@ management:
   endpoint:
     health:
       show-details: always
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    config-url: /execution/v3/api-docs/swagger-config
+    url: /execution/v3/api-docs

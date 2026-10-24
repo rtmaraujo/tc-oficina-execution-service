@@ -56,6 +56,13 @@ curl -X POST "http://localhost:8083/api/execution/1/finalizar"
 curl "http://localhost:8083/api/execution/status/DIAGNOSTICO"
 ```
 
+## Documentação da API (Swagger)
+
+Desabilitado no perfil local e habilitado apenas no perfil `k8s`:
+
+- `http://35.84.122.229/execution/swagger-ui.html`
+- OpenAPI: `http://35.84.122.229/execution/v3/api-docs`
+
 ## Status da execução
 
 `AGUARDANDO` → `DIAGNOSTICO` → `REPARO` → `TESTE` → `CONCLUIDA` → `ENTREGUE`
