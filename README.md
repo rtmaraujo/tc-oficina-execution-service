@@ -60,8 +60,8 @@ curl "http://localhost:8083/api/execution/status/DIAGNOSTICO"
 
 Desabilitado no perfil local e habilitado apenas no perfil `k8s`:
 
-- `http://35.84.122.229/execution/swagger-ui.html`
-- OpenAPI: `http://35.84.122.229/execution/v3/api-docs`
+- `http://44.253.115.185/execution/swagger-ui.html`
+- OpenAPI: `http://44.253.115.185/execution/v3/api-docs`
 
 ## Status da execução
 
@@ -154,9 +154,9 @@ kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/ingressroute.yaml
 ```
 
-- Imagem: `097735115452.dkr.ecr.us-west-2.amazonaws.com/tc-oficina-execution-service:latest`
+- Imagem: `200111905660.dkr.ecr.us-west-2.amazonaws.com/tc-oficina-execution-service:latest`
 - 2 réplicas, probes em `/actuator/health/{readiness,liveness}`
-- Rota Traefik: `http://35.84.122.229/execution/*` (prefixo removido)
+- Rota Traefik: `http://44.253.115.185/execution/*` (prefixo removido)
 
 ## CI/CD
 
