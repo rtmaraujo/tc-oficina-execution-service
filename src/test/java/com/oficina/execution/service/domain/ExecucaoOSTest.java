@@ -14,6 +14,7 @@ class ExecucaoOSTest {
         ExecucaoOS execucao = new ExecucaoOS();
 
         assertNull(execucao.getId());
+        assertNull(execucao.getSagaId());
         assertNull(execucao.getOsNumero());
         assertNull(execucao.getDescricaoDiagnostico());
         assertNull(execucao.getStatusExecucao());
@@ -29,6 +30,7 @@ class ExecucaoOSTest {
         ExecucaoOS execucao = new ExecucaoOS(1L, "OS-1");
 
         assertEquals(1L, execucao.getId());
+        assertNull(execucao.getSagaId());
         assertEquals("OS-1", execucao.getOsNumero());
         assertNotNull(execucao.getDataInicio());
     }
@@ -39,6 +41,7 @@ class ExecucaoOSTest {
         ExecucaoOS execucao = new ExecucaoOS();
 
         execucao.setId(2L);
+        execucao.setSagaId("saga-2");
         execucao.setOsNumero("OS-2");
         execucao.setDescricaoDiagnostico("Diagnostico completo");
         execucao.setStatusExecucao("REPARO");
@@ -48,6 +51,7 @@ class ExecucaoOSTest {
         execucao.setDataConclusao("2026-01-02T10:00:00");
 
         assertEquals(2L, execucao.getId());
+        assertEquals("saga-2", execucao.getSagaId());
         assertEquals("OS-2", execucao.getOsNumero());
         assertEquals("Diagnostico completo", execucao.getDescricaoDiagnostico());
         assertEquals("REPARO", execucao.getStatusExecucao());

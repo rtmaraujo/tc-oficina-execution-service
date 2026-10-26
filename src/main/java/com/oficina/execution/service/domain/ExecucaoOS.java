@@ -2,6 +2,7 @@ package com.oficina.execution.service.domain;
 
 public class ExecucaoOS {
     private Long id;
+    private String sagaId;
     private String osNumero;
     private String descricaoDiagnostico;
     private String statusExecucao;
@@ -13,6 +14,8 @@ public class ExecucaoOS {
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+    public String getSagaId() { return sagaId; }
+    public void setSagaId(String sagaId) { this.sagaId = sagaId; }
     public String getOsNumero() { return osNumero; }
     public void setOsNumero(String osNumero) { this.osNumero = osNumero; }
     public String getDescricaoDiagnostico() { return descricaoDiagnostico; }

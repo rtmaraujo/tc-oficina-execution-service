@@ -1,5 +1,6 @@
 package com.oficina.execution.service.application.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oficina.execution.service.domain.ExecucaoOS;
 import com.oficina.execution.service.domain.StatusExecucao;
 import com.oficina.execution.service.infrastructure.repository.ExecucaoOSRepository;
@@ -32,11 +33,12 @@ class ExecutionApplicationServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new ExecutionApplicationServiceImpl(repository, kafkaTemplate);
+        service = new ExecutionApplicationServiceImpl(repository, kafkaTemplate, new ObjectMapper());
     }
 
     private ExecucaoOS execucaoExistente() {
         ExecucaoOS execucao = new ExecucaoOS(1L, "OS-1");
+        execucao.setSagaId("saga-1");
         execucao.setStatusExecucao(StatusExecucao.AGUARDANDO.toString());
         return execucao;
     }
@@ -58,7 +60,7 @@ class ExecutionApplicationServiceImplTest {
         assertEquals("OS-1", result.getOsNumero());
         assertEquals(StatusExecucao.DIAGNOSTICO.toString(), result.getStatusExecucao());
         assertNotNull(result.getDataInicio());
-        verify(kafkaTemplate).send(eq("order-progress"), eq("10"), contains("osNumero='OS-1'"));
+        verify(kafkaTemplate).send(eq("order-progress"), eq("10"), contains("\"osNumero\":\"OS-1\""));
     }
 
     @Test
@@ -68,11 +70,25 @@ class ExecutionApplicationServiceImplTest {
         when(repository.findByOsNumero("OS-1")).thenReturn(existente);
         when(repository.save(any(ExecucaoOS.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        ExecucaoOS result = service.iniciarDiagnostico("OS-1");
+        ExecucaoOS result = service.iniciarPorSaga("saga-1", "OS-1");
 
         assertSame(existente, result);
+        assertEquals("saga-1", result.getSagaId());
         assertEquals(StatusExecucao.DIAGNOSTICO.toString(), result.getStatusExecucao());
         verify(repository, times(1)).save(existente);
+    }
+
+    @Test
+    @DisplayName("Deve iniciar execucao via saga quando ainda nao existir")
+    void shouldStartFromSagaWhenNew() {
+        when(repository.findByOsNumero("OS-2")).thenReturn(null);
+        when(repository.save(any(ExecucaoOS.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        ExecucaoOS result = service.iniciarPorSaga("saga-2", "OS-2");
+
+        assertNotNull(result.getId());
+        assertEquals("saga-2", result.getSagaId());
+        assertEquals("OS-2", result.getOsNumero());
     }
 
     @Test
@@ -125,7 +141,7 @@ class ExecutionApplicationServiceImplTest {
         ExecucaoOS result = service.registrarPecaSubstituida(1L, "Pastilha de freio");
 
         assertEquals("Pastilha de freio", result.getPecasSubstituidas());
-        verify(kafkaTemplate).send(eq("order-progress"), eq("1"), contains("Pastilha de freio"));
+        verify(kafkaTemplate).send(eq("order-progress"), eq("1"), contains("PARTS_REGISTERED"));
     }
 
     @Test
@@ -159,6 +175,28 @@ class ExecutionApplicationServiceImplTest {
 
         assertNull(service.finalizarExecucao(99L));
         verify(repository, never()).save(any(ExecucaoOS.class));
+        verifyNoInteractions(kafkaTemplate);
+    }
+
+    @Test
+    @DisplayName("Deve cancelar execucao por saga e publicar evento de compensacao")
+    void shouldCancelBySaga() {
+        ExecucaoOS execucao = execucaoExistente();
+        when(repository.findByOsNumero("OS-1")).thenReturn(execucao);
+        when(repository.save(any(ExecucaoOS.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        ExecucaoOS result = service.cancelarPorSaga("saga-1", "OS-1");
+
+        assertEquals(StatusExecucao.CANCELADA.toString(), result.getStatusExecucao());
+        verify(kafkaTemplate).send(eq("execution-compensated"), eq("1"), contains("EXECUTION_CANCELLED"));
+    }
+
+    @Test
+    @DisplayName("Deve retornar null ao cancelar execucao inexistente")
+    void shouldReturnNullWhenCancellingUnknownExecution() {
+        when(repository.findByOsNumero("OS-X")).thenReturn(null);
+
+        assertNull(service.cancelarPorSaga("saga-x", "OS-X"));
         verifyNoInteractions(kafkaTemplate);
     }
 
