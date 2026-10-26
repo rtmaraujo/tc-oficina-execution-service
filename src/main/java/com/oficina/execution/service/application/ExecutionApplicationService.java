@@ -5,9 +5,11 @@ import java.util.List;
 
 public interface ExecutionApplicationService {
     ExecucaoOS iniciarDiagnostico(String osNumero);
+    ExecucaoOS iniciarPorSaga(String sagaId, String osNumero);
     ExecucaoOS atualizarStatus(Long id, String statusExecucao);
     ExecucaoOS registrarPecaSubstituida(Long id, String pecas);
     ExecucaoOS finalizarExecucao(Long id);
+    ExecucaoOS cancelarPorSaga(String sagaId, String osNumero);
     ExecucaoOS consultarPorId(Long id);
     List<ExecucaoOS> listarPorStatus(String statusExecucao);
 }

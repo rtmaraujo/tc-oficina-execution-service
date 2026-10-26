@@ -25,6 +25,7 @@ class ExecucaoOSEntityTest {
     @DisplayName("Deve criar entidade a partir do dominio sem data de conclusao")
     void shouldCreateEntityFromDomainWithoutConclusionDate() {
         ExecucaoOS dominio = new ExecucaoOS(1L, "OS-1");
+        dominio.setSagaId("saga-1");
         dominio.setDescricaoDiagnostico("Diagnostico");
         dominio.setStatusExecucao("DIAGNOSTICO");
         dominio.setPecasSubstituidas("Filtro");
@@ -33,6 +34,7 @@ class ExecucaoOSEntityTest {
         ExecucaoOSEntity entity = new ExecucaoOSEntity(dominio);
 
         assertEquals(1L, entity.getId());
+        assertEquals("saga-1", entity.getSagaId());
         assertEquals("OS-1", entity.getOsNumero());
         assertEquals("Diagnostico", entity.getDescricaoDiagnostico());
         assertEquals("DIAGNOSTICO", entity.getStatusExecucao());
@@ -62,6 +64,7 @@ class ExecucaoOSEntityTest {
         LocalDateTime conclusao = LocalDateTime.of(2026, 3, 2, 18, 0);
 
         entity.setId(3L);
+        entity.setSagaId("saga-3");
         entity.setOsNumero("OS-3");
         entity.setDescricaoDiagnostico("Diagnostico");
         entity.setStatusExecucao("CONCLUIDA");
@@ -71,6 +74,7 @@ class ExecucaoOSEntityTest {
         entity.setDataConclusao(conclusao);
 
         assertEquals(3L, entity.getId());
+        assertEquals("saga-3", entity.getSagaId());
         assertEquals("OS-3", entity.getOsNumero());
         assertEquals("Diagnostico", entity.getDescricaoDiagnostico());
         assertEquals("CONCLUIDA", entity.getStatusExecucao());
@@ -85,6 +89,7 @@ class ExecucaoOSEntityTest {
     void shouldConvertToDomainWithoutConclusionDate() {
         ExecucaoOSEntity entity = new ExecucaoOSEntity();
         entity.setId(4L);
+        entity.setSagaId("saga-4");
         entity.setOsNumero("OS-4");
         entity.setDescricaoDiagnostico("Diagnostico");
         entity.setStatusExecucao("REPARO");
@@ -95,6 +100,7 @@ class ExecucaoOSEntityTest {
         ExecucaoOS dominio = entity.toDomain();
 
         assertEquals(4L, dominio.getId());
+        assertEquals("saga-4", dominio.getSagaId());
         assertEquals("OS-4", dominio.getOsNumero());
         assertEquals("Diagnostico", dominio.getDescricaoDiagnostico());
         assertEquals("REPARO", dominio.getStatusExecucao());

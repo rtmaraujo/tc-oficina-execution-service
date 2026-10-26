@@ -1,8 +1,7 @@
 package com.oficina.execution.service.presentation;
 
-import com.oficina.execution.service.domain.ExecucaoOS;
 import com.oficina.execution.service.application.ExecutionApplicationService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.oficina.execution.service.domain.ExecucaoOS;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,8 +11,11 @@ import java.util.List;
 @RequestMapping("/api/execution")
 public class ExecutionController {
 
-    @Autowired
-    private ExecutionApplicationService executionService;
+    private final ExecutionApplicationService executionService;
+
+    public ExecutionController(ExecutionApplicationService executionService) {
+        this.executionService = executionService;
+    }
 
     @PostMapping("/iniciar/{osNumero}")
     public ResponseEntity<ExecucaoOS> iniciar(@PathVariable String osNumero) {

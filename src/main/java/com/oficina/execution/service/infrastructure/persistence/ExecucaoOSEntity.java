@@ -13,6 +13,8 @@ public class ExecucaoOSEntity {
     @Id
     private Long id;
 
+    private String sagaId;
+
     private String osNumero;
 
     private String descricaoDiagnostico;
@@ -35,6 +37,7 @@ public class ExecucaoOSEntity {
     // Constructor from domain
     public ExecucaoOSEntity(ExecucaoOS dominio) {
         this.id = dominio.getId();
+        this.sagaId = dominio.getSagaId();
         this.osNumero = dominio.getOsNumero();
         this.descricaoDiagnostico = dominio.getDescricaoDiagnostico();
         this.statusExecucao = dominio.getStatusExecucao();
@@ -47,6 +50,8 @@ public class ExecucaoOSEntity {
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+    public String getSagaId() { return sagaId; }
+    public void setSagaId(String sagaId) { this.sagaId = sagaId; }
     public String getOsNumero() { return osNumero; }
     public void setOsNumero(String osNumero) { this.osNumero = osNumero; }
     public String getDescricaoDiagnostico() { return descricaoDiagnostico; }
@@ -66,6 +71,7 @@ public class ExecucaoOSEntity {
     public ExecucaoOS toDomain() {
         ExecucaoOS dominio = new ExecucaoOS();
         dominio.setId(this.id);
+        dominio.setSagaId(this.sagaId);
         dominio.setOsNumero(this.osNumero);
         dominio.setDescricaoDiagnostico(this.descricaoDiagnostico);
         dominio.setStatusExecucao(this.statusExecucao);
