@@ -6,6 +6,7 @@ Microsserviço de **execução e diagnóstico** da Oficina Mecânica. Acompanha 
 - **Banco:** MongoDB (`oficina_execution`)
 - **Namespace Kubernetes:** `oficina-execution`
 - **Repositório:** https://github.com/rtmaraujo/tc-oficina-execution-service
+- **Documentação da entrega:** https://github.com/rtmaraujo/tc-oficina-docs
 
 ## Stack
 
@@ -42,7 +43,6 @@ config/         -> Listeners Kafka
 ```bash
 # Iniciar diagnóstico
 curl -X POST "http://localhost:8083/api/execution/iniciar/OS-123"
-
 # Atualizar status
 curl -X PUT "http://localhost:8083/api/execution/1/status?statusExecucao=REPARO"
 
@@ -60,8 +60,22 @@ curl "http://localhost:8083/api/execution/status/DIAGNOSTICO"
 
 Desabilitado no perfil local e habilitado apenas no perfil `k8s`:
 
-- `http://44.253.115.185/execution/swagger-ui.html`
+- `http://44.253.115.185/execution/swagger-ui/index.html`
 - OpenAPI: `http://44.253.115.185/execution/v3/api-docs`
+
+## Papel na Saga
+
+O Execution é **participante** da Saga: recebe o comando de execução e devolve o progresso.
+
+| Evento | Direção | Quando |
+|---|---|---|
+| `execution-requested` | Consome | Cria a execução (`DIAGNOSTICO`) a partir da OS paga |
+| `compensate-execution` | Consome | Cancela a execução quando a saga é compensada |
+| `order-progress` | Produz | Início e mudança de status da execução |
+| `order-finalized` | Produz | Ao finalizar/entregar a execução |
+| `execution-compensated` | Produz | Confirmação da compensação |
+
+Grupo de consumo: `execution-service-group`. Idempotência via `evento_processado`; falhas esgotadas vão para `execution-requested.DLT` / `compensate-execution.DLT`.
 
 ## Status da execução
 
@@ -75,6 +89,7 @@ Coleção MongoDB `execucao_os`:
 | Campo | Tipo | Observação |
 |---|---|---|
 | `id` | Long | `@Id` |
+| `sagaId` | String | `SAGA-<numeroOS>` |
 | `osNumero` | String | número da OS |
 | `descricaoDiagnostico` | String | diagnóstico técnico |
 | `statusExecucao` | String | status atual |
@@ -89,7 +104,9 @@ Coleção MongoDB `execucao_os`:
 |---|---|---|
 | `order-progress` | Produz | Início, mudança de status e registro de peças |
 | `order-finalized` | Produz | Status `CONCLUIDA` ou ao finalizar a execução |
-| `order-finalized` | Consome | Listener `execution-service-group` |
+| `execution-compensated` | Produz | Confirmação da compensação |
+| `execution-requested` | Consome | Cria a execução a partir da OS paga |
+| `compensate-execution` | Consome | Cancela a execução na compensação da saga |
 
 ## Configuração
 
@@ -127,8 +144,8 @@ mvn test              # testes unitários
 mvn verify            # testes + jacoco:check (mínimo 85% LINE e BRANCH)
 ```
 
-- Testes unitários: domínio, entidade de persistência e serviço de aplicação.
-- Cobertura atual: **100%** de linhas e branches.
+- Testes unitários: domínio, documento Mongo, serviço de aplicação e listeners.
+- Cobertura atual: **44 testes**, **98,63%** de linhas e **90,38%** de branches.
 - Relatório: `target/site/jacoco/index.html`.
 
 O build falha se a cobertura ficar abaixo de 85%, via `jacoco-maven-plugin` (`check`).
@@ -168,7 +185,12 @@ kubectl apply -f k8s/ingressroute.yaml
 
 ## Observabilidade
 
-Actuator exposto em `/actuator` (`health`, `info`, `metrics`, `prometheus` no perfil `k8s`).
+- Actuator em `/actuator` (`health`, `info`, `metrics`, `prometheus` no perfil `k8s`).
+- Probes de readiness/liveness em `/actuator/health/readiness` e `/actuator/health/liveness`.
+- Métricas no Prometheus: `http://44.253.115.185/prometheus/`.
+- Dashboard: `http://44.253.115.185/grafana/` → **Oficina Fase 4 - Microsservicos**.
+- Traces distribuídos: `http://44.253.115.185/zipkin/`.
+- O `sagaId` é propagado no MDC e correlaciona a execução com a OS de origem.
 
 ## Estrutura
 
